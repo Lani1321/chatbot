@@ -24,6 +24,7 @@ gem 'turbolinks', '~> 5'
 gem 'jbuilder', '~> 2.5'
 # Client for google translate API
 gem 'google-translate'
+gem 'easy_translate'
 # Use twilio-ruby to communicate with the Twilio API
 gem 'twilio-ruby', '~> 5.1.1'
 # Use Redis adapter to run Action Cable in production
