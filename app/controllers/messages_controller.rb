@@ -8,7 +8,7 @@ class MessagesController < ApplicationController
     twilio_sid = 'ACf92fbc0df0473fba6673a485c2d3cf9c'
     twilio_token = '1fbdc1437c16d0df71e8dd6c48beab33'
     languages = EasyTranslate::LANGUAGES.values
-    translation = EasyTranslate.translate("#{message_body}", :to => :th, :key => 'AIzaSyBukYm7kIRpauOVu6eH7oA-plDDWlEuQBg')
+    # translation = EasyTranslate.translate("#{message_body}", :to => :th, :key => 'AIzaSyBukYm7kIRpauOVu6eH7oA-plDDWlEuQBg')
     # languages = 
     #   EasyTranslate::LANGUAGES.values.each.with_index do |lang, i|
     #     puts "#{i+1}. #{lang}"
@@ -26,15 +26,19 @@ class MessagesController < ApplicationController
         to: from_number,
         body: EasyTranslate.translate("Awesome, I speak #{message_body} too! It is really nice to meet you!", to: "#{message_body.downcase}", key: 'AIzaSyBukYm7kIRpauOVu6eH7oA-plDDWlEuQBg')
       )
-
     else
       sms = @client.api.account.messages.create(
         from: "+1#{twilio_phone_number}",
         to: from_number,
         body: "Welcome to Chatbot!! Your number is #{from_number}.  Here are a list of lanaguages I'm fluent in:#{languages}.  What language do you prefer to text in?"
       )
-    end
-    
+    end 
+  end
+
+  def send_sms
+    to = params["To"]
+    sms = params["Body"]
+    @client = Twilio::REST::Client.new twilio_sid, twilio_token 
   end
  
   private
