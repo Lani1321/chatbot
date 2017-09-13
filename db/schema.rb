@@ -10,15 +10,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170830002219) do
+ActiveRecord::Schema.define(version: 20170913200414) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "users", force: :cascade do |t|
-    t.string  "language"
-    t.string  "phone"
-    t.integer "friend_id"
+    t.string "language"
+    t.string "phone_number"
+    t.string "friend_phone_number"
   end
 
 end
