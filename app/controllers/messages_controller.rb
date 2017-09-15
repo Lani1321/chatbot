@@ -34,7 +34,7 @@ class MessagesController < ApplicationController
       # Set language
       when "Thai\s", "Spanish\s", "Japanese\s" , "German\s", "Greek\s", "Turkish\s", "English\s", "Afrikaans\s", "Albanian\s", "Arabic\s", "Belarusian\s", "Chinese_simplified\s", "Croatian\s", "Czech\s", "Danish\s", "Dutch\s", "Estonian\s", "Filipino\s", "Finnish\s", "French\s", "Galician\s", "Hebrew\s", "Hindi\s", "Hungarian\s", "Icelandic\s", "Indonesian\s", "Irish\s", "Italian\s", "Japanese\s", "Korean\s", "Latin\s", "Latvian\s", "Lituanian\s", "Macedonian\s", "Malay\s", "Maltese\s", "Norwegian\s", "Persian\s", "Polish\s", "Poruguese\s", "Romanian\s", "Russian\s", "Serbian\s", "Slovak\s", "Slovenian\s", "Swahili\s", "Swedish\s", "Turkish\s", "Ukranian\s", "Vietnamese\s", "Welsh\s", "Yiddish\s"
         send_sms(from_number, "You set your language as #{message_body}.  Please, enter the phone number you would like to message.")
-        user = User.find_by_phone_number(new_num)
+        user = User.find_by_phone_number(from_number)
         user.update(language: message_body)
       
       when "Yes", "yes"
