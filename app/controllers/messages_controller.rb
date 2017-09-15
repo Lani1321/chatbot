@@ -28,6 +28,8 @@ class MessagesController < ApplicationController
           to: from_number,
           body: "You want to text #{message_body}?"
         )
+        # Ensure that a new record doesn't get created for the same number, but with characters
+        # i.e. 330-957-7848 vs 3309577848 
         friend_phone = "#{message_body}"
         friend_phone_number_no_char = friend_phone.gsub(/[\-.()a-z\s]/,"")
         user.friend_phone_number = friend_phone_number_no_char
@@ -73,12 +75,7 @@ class MessagesController < ApplicationController
           )
         # If person 2 has langauge set => send message
         else
-          @client.api.account.messages.create(
-            from: "+1#{twilio_phone_number}",
-            to: friend.phone_number,
-            body: EasyTranslate.translate("#{user.phone_number} says:\n#{message_body}", to: "#{friend.language.downcase}", key: 'AIzaSyBukYm7kIRpauOVu6eH7oA-plDDWlEuQBg')
-            # EasyTranslate.translate("#{user.phone_number} says:\n'#{message_body}", to: "#{friend.language.downcase}", key: 'AIzaSyBukYm7kIRpauOVu6eH7oA-plDDWlEuQBg')
-            )
+          send_sms(friend.phone_number, EasyTranslate.translate("#{user.phone_number} says:\n#{message_body}", to: "#{friend.language.downcase}", key: ENV['GOOGLE_TRANSLATE_KEY']))
         end
       end
     # If user doesn't exist
@@ -98,10 +95,8 @@ class MessagesController < ApplicationController
   # Create person 2 an account when user provides a friend phone number
   # have SMS take arguments, who you're sending it to, and what the message is)
   def send_sms(recipient_phone_number, message)
-    # to = params["To"] #=> comment this line out if it takes arguments
-    # sms = params["Body"] #=>coment this line out if it takes arguments
     twilio_phone_number = '2164782291'
-    twilio_client.account.messages.create(
+    twilio_client.api.account.messages.create(
       to: recipient_phone_number,
       from: "+1#{twilio_phone_number}",
       body: message
