@@ -3,31 +3,30 @@ class MessagesController < ApplicationController
   
   def reply
     message_body = params["Body"]
-    from_number = params["From"]
+    from_number = params["From"][2..-1]
     languages = EasyTranslate::LANGUAGES.values.join("\n").upcase
-    twilio_client
-    # Take out the first two characters to search in db bc Twilio adds +1 to params["from"]
-    num_without_symbol = from_number.slice!(0..1)
-    new_num = from_number
-    user = User.find_by_phone_number(new_num)
-    # If user exsists
+
+    user = User.find_by_phone_number(from_number)
+    
+    # If user exists
     if user != nil
       case message_body
       
       # This filters phone numbers, country indicators, extensions, dashes, periods and parenthases
       when /^(?:(?:\(?(?:00|\+)([1-4]\d\d|[1-9]\d?)\)?)?[\-\.\ \\\/]?)?((?:\(?\d{1,}\)?[\-\.\ \\\/]?){0,})(?:[\-\.\ \\\/]?(?:#|ext\.?|extension|x)[\-\.\ \\\/]?(\d+))?$/i
         send_sms(from_number, "You want to text #{message_body}?")
+        
         # Filters white space and any non digit
         # Ensure that a new record doesn't get created for the same number
         # i.e. 330-957-7848 vs 3309577848 
-        friend_phone = "#{message_body}"
+        friend_phone = message_body
         friend_phone_number_no_char = friend_phone.gsub(/[\s\D]/,"")
         user.friend_phone_number = friend_phone_number_no_char
         user.save
         
         # Create person 2 with given phone number if the record doesn't already exist
         if User.where(:phone_number => "#{user.friend_phone_number}").blank?
-          person_two = User.create(
+          User.create(
             :phone_number => user.friend_phone_number
           )
         end
@@ -36,8 +35,7 @@ class MessagesController < ApplicationController
       when "Thai\s", "Spanish\s", "Japanese\s" , "German\s", "Greek\s", "Turkish\s", "English\s", "Afrikaans\s", "Albanian\s", "Arabic\s", "Belarusian\s", "Chinese_simplified\s", "Croatian\s", "Czech\s", "Danish\s", "Dutch\s", "Estonian\s", "Filipino\s", "Finnish\s", "French\s", "Galician\s", "Hebrew\s", "Hindi\s", "Hungarian\s", "Icelandic\s", "Indonesian\s", "Irish\s", "Italian\s", "Japanese\s", "Korean\s", "Latin\s", "Latvian\s", "Lituanian\s", "Macedonian\s", "Malay\s", "Maltese\s", "Norwegian\s", "Persian\s", "Polish\s", "Poruguese\s", "Romanian\s", "Russian\s", "Serbian\s", "Slovak\s", "Slovenian\s", "Swahili\s", "Swedish\s", "Turkish\s", "Ukranian\s", "Vietnamese\s", "Welsh\s", "Yiddish\s"
         send_sms(from_number, "You set your language as #{message_body}.  Please, enter the phone number you would like to message.")
         user = User.find_by_phone_number(new_num)
-        user.language = "#{message_body}"
-        user.save
+        user.update(language: message_body)
       
       when "Yes", "yes"
         send_sms(from_number, "Alright, what would you like to say?")
@@ -54,7 +52,7 @@ class MessagesController < ApplicationController
 
         # If person 2 has langauge set => send message
         else
-          send_sms(friend.phone_number, EasyTranslate.translate("#{user.phone_number} says:\n#{message_body}", to: "#{friend.language.downcase}", key: ENV['GOOGLE_TRANSLATE_KEY']))
+          send_sms(friend.phone_number, EasyTranslate.translate("#{user.phone_number} says:\n#{message_body}", to: "#{friend.language.downcase}", key: Rails.application.secrets[:google_translate_key]))
         end
       end
     
@@ -80,8 +78,8 @@ class MessagesController < ApplicationController
   private
  
   def twilio_client
-    twilio_sid = ENV['TWILIO_ACCOUNT_SID']
-    twilio_token = ENV['TWILIO_AUTH_TOKEN']
+    twilio_sid = Rails.application.secrets[:twilio_account_sid]
+    twilio_token = Rails.application.secrets[:twilio_auth_token]
     Twilio::REST::Client.new twilio_sid, twilio_token
   end
 end
