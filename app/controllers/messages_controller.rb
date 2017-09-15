@@ -10,7 +10,6 @@ class MessagesController < ApplicationController
     num_without_symbol = from_number.slice!(0..1)
     new_num = from_number
     user = User.find_by_phone_number(new_num)
-    
     # If user exsists
     if user != nil
       case message_body
