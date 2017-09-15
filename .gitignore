@@ -24,4 +24,4 @@
 .env
 
 # Ignore API keys
-config/local_env.yml
+/config/*local_env.yml
