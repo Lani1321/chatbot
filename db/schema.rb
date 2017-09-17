@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170913200414) do
+ActiveRecord::Schema.define(version: 20170917175023) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -19,6 +19,7 @@ ActiveRecord::Schema.define(version: 20170913200414) do
     t.string "language"
     t.string "phone_number"
     t.string "friend_phone_number"
+    t.string "state"
   end
 
 end
