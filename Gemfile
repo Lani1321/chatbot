@@ -28,7 +28,7 @@ gem 'easy_translate'
 # Use twilio-ruby to communicate with the Twilio API
 gem 'twilio-ruby', '~> 5.1.1'
 # User will have a different state for onboarding and messaging
-gem 'state_machine'
+gem 'state_machines-activerecord'
 # Use Redis adapter to run Action Cable in production
 # gem 'redis', '~> 3.0'
 # Use ActiveModel has_secure_password
