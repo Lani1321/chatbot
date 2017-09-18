@@ -7,9 +7,4 @@ class User < ApplicationRecord
     end
   end
 
-  # This *must* be called, otherwise states won't get initialized
-  def initialize
-    super()
-  end
-
 end
