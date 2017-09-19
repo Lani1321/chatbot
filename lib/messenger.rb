@@ -1,7 +1,8 @@
 class Messenger
 
   def self.respond_to_text(message_body, from_number)
-    user = User.find_by_phone_number(from_number)
+    user = User.find_by_phone_number(from_number) #find_or_create_by_phone_number
+    # Create after_Create in user model
     languages = EasyTranslate::LANGUAGES.values.join("\n").upcase
     # If user exists
     if user != nil    
@@ -12,7 +13,8 @@ class Messenger
       elsif user.state == "selecting_language"
         set_language(message_body, from_number)
   
-      # User state will be messaging_friend
+      elsif user.state == "person_two_select_language"
+      # User state is messaging_friend
       else
         chat_bot(message_body, from_number)
       end
@@ -39,18 +41,28 @@ class Messenger
     user.select_number
     if User.where(:phone_number => "#{user.friend_phone_number}").blank?
       User.create(
-        :phone_number => user.friend_phone_number
-        # :friend_phone_number => user.phone_number
+        :phone_number => user.friend_phone_number,
+        :friend_phone_number => user.phone_number
       )
     end
   end
 
   def self.set_language(message_body, from_number)
     # when "Thai", "Spanish", "Japanese", "German", "Greek", "Turkish", "English", "Afrikaans", "Albanian", "Arabic", "Belarusian", "Chinese_simplified", "Croatian", "Czech", "Danish", "Dutch", "Estonian", "Filipino", "Finnish", "French", "Galician", "Hebrew", "Hindi", "Hungarian", "Icelandic", "Indonesian", "Irish", "Italian", "Japanese", "Korean", "Latin", "Latvian", "Lituanian", "Macedonian", "Malay", "Maltese", "Norwegian", "Persian", "Polish", "Poruguese", "Romanian", "Russian", "Serbian", "Slovak", "Slovenian", "Swahili", "Swedish", "Turkish", "Ukranian", "Vietnamese", "Welsh", "Yiddish"
-    send_sms(from_number, "You set your language as #{message_body}.  Please, enter the phone number you would like to message.")
     user = User.find_by_phone_number(from_number)
-    user.update(language: message_body)
-    user.select_language
+    # We don't want user inputting a phone number when they are person two
+    if user.phone_number && user.friend_phone_number
+      send_sms(from_number, "You set your language as #{message_body}.  You can start messaging now!")
+      user.update(language: message_body)
+      user.select_language_person_two
+    else 
+      send_sms(from_number, "You set your language as #{message_body}.  Please, enter the phone number you would like to message.")
+      user.update(language: message_body)
+      user.select_language
+    # Check if user already has a phone number AND friend phone number ==> change state to messaging friend
+    # Active record callbacks => any time you create a user, it will run this function
+      # 
+    end
   end
 
   def self.chat_bot(message_body, from_number)
@@ -82,8 +94,6 @@ class Messenger
       )
     send_sms(from_number, "Welcome to Chatbot!! Here are a list of languages I'm fluent in:\n#{languages}.\nWhat language do you prefer to text in?" )
   end
-
-
 
   def self.send_sms(recipient_phone_number, message)
     twilio_phone_number = '2164782291'
