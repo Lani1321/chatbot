@@ -32,7 +32,7 @@ class Messenger
     # This filters phone numbers, country indicators, dashes, periods and parenthases
     if message_body =~ /[0-9, +, ., -, (, ), -]{10,15}/
       user = User.find_by_phone_number(from_number)
-      send_sms(from_number, "You will be sending messages to: #{message_body}")
+      send_sms(from_number, "You will be sending messages to: #{message_body}.  Feel free to send away!")
           
       # Filters white space and any non digit
       # Ensure that a new record doesn't get created for the same number
