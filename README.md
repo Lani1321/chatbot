@@ -4,7 +4,7 @@ Have you ever tried to communicate with someone with a language barrier?  Chatbo
 
 ## Usage
 Send a text message to: (216)478-2291
-Simply set your language and the telephone number you wish to message by following the prompt, then you can start texting away!
+Simply set your language and the telephone number you wish to message by following the prompt, then you can start texting away!!
 
 ![Alt Text](https://i.imgur.com/g2FE2vI.gif)
 
