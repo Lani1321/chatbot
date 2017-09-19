@@ -70,7 +70,8 @@ class Messenger
         user.select_language
       end
     else
-      send_sms(from_number, "I'm sorry, I don't recognize that language.  Please, take a look at the list of available languages and try again.")
+      languages = EasyTranslate::LANGUAGES.values.join("\n").upcase
+      send_sms(from_number, "I'm sorry, I don't recognize that language.  Please, take a look at the list of available languages and try again.\n#{languages}")
     end
   end
 
@@ -90,7 +91,7 @@ class Messenger
 
   def self.set_language_for_friend(friend, user, message_body)
     languages = EasyTranslate::LANGUAGES.values.join("\n").upcase
-    send_sms(friend.phone_number, "Hey there! #{user.phone_number} wants to chat with you. Here are a list of languages I'm fluent in:\n#{languages}.\nWhat language do you prefer to text in?")
+    send_sms(friend.phone_number, "Hey there! #{user.phone_number} wants to chat with you. I'm fluent in just about any language.  Please select a language you would like to text in.")
   end
 
   def self.send_translated_message(friend, user, message_body)
@@ -101,7 +102,7 @@ class Messenger
     user = User.create(
       :phone_number => from_number
       )
-    send_sms(from_number, "Welcome to Chatbot!! Here are a list of languages I'm fluent in:\n#{languages}.\nWhat language do you prefer to text in?" )
+    send_sms(from_number, "Welcome to Chatbot!!  I'm fluent in just about any language.  Please select a language you would like to text in." )
   end
 
   def self.send_sms(recipient_phone_number, message)

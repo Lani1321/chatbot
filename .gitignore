@@ -25,3 +25,4 @@
 
 # Ignore API keys
 /config/local_env.yml
+/config/secrets.yml
