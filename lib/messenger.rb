@@ -4,6 +4,7 @@ class Messenger
     user = User.find_by_phone_number(from_number)
     
     languages = EasyTranslate::LANGUAGES.values.join("\n").upcase
+    
     # If user exists
     if user != nil    
       if user.state == "selecting_number"  
@@ -27,23 +28,27 @@ class Messenger
   end
 
   def self.save_friend_num(message_body, from_number)
-    # This filters phone numbers, country indicators, extensions, dashes, periods and parenthases
-    # when /^(?:(?:\(?(?:00|\+)([1-4]\d\d|[1-9]\d?)\)?)?[\-\.\ \\\/]?)?((?:\(?\d{1,}\)?[\-\.\ \\\/]?){0,})(?:[\-\.\ \\\/]?(?:#|ext\.?|extension|x)[\-\.\ \\\/]?(\d+))?$/i
-    user = User.find_by_phone_number(from_number)
-    send_sms(from_number, "You will be sending messages to: #{message_body}")
-        
-    # Filters white space and any non digit
-    # Ensure that a new record doesn't get created for the same number
-    # i.e. 330-957-7848 vs 3309577848 
-    friend_phone = message_body
-    friend_phone_number_no_char = friend_phone.gsub(/[\s\D]/,"")
-    user.update(friend_phone_number: friend_phone_number_no_char)
-    user.select_number
-    if User.where(:phone_number => "#{user.friend_phone_number}").blank?
-      User.create(
-        :phone_number => user.friend_phone_number,
-        :friend_phone_number => user.phone_number
-      )
+    
+    # This filters phone numbers, country indicators, dashes, periods and parenthases
+    if message_body =~ /[0-9, +, ., -, (, ), -]{10,15}/
+      user = User.find_by_phone_number(from_number)
+      send_sms(from_number, "You will be sending messages to: #{message_body}")
+          
+      # Filters white space and any non digit
+      # Ensure that a new record doesn't get created for the same number
+      # i.e. 330-957-7848 vs 3309577848 
+      friend_phone = message_body
+      friend_phone_number_no_char = friend_phone.gsub(/[\s\D]/,"")
+      user.update(friend_phone_number: friend_phone_number_no_char)
+      user.select_number
+      if User.where(:phone_number => "#{user.friend_phone_number}").blank?
+        User.create(
+          :phone_number => user.friend_phone_number,
+          :friend_phone_number => user.phone_number
+        )
+      end
+    else
+      send_sms(from_number, "Please enter a valid phone number")
     end
   end
 
@@ -51,14 +56,14 @@ class Messenger
     downcase_input = message_body.downcase
     if downcase_input.in?(EasyTranslate::LANGUAGES.values)
       user = User.find_by_phone_number(from_number)
-      
+
       # We don't want user inputting a phone number when they are person two
       if user.phone_number && user.friend_phone_number
-        send_sms(from_number, "You set your language as #{message_body}.  You can start messaging now!")
+        send_sms(from_number, "You set your language to #{message_body}.  You can start messaging now!")
         user.update(language: message_body)
         user.select_language_person_two
       else 
-        send_sms(from_number, "You set your language as #{message_body}.  Please, enter the phone number you would like to message.")
+        send_sms(from_number, "You set your language to #{message_body}.  Please, enter the phone number you would like to message.")
         user.update(language: message_body)
         user.select_language
       end
