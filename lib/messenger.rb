@@ -15,6 +15,7 @@ class Messenger
         set_language(message_body, from_number)
   
       elsif user.state == "person_two_select_language"
+      
       # User state is messaging_friend
       else
         chat_bot(message_body, from_number)
@@ -29,6 +30,7 @@ class Messenger
 
   def self.save_friend_num(message_body, from_number)
     
+    # TODO: Account for all countries
     # This filters phone numbers, country indicators, dashes, periods and parenthases
     if message_body =~ /[0-9, +, ., -, (, ), -]{10,15}/
       user = User.find_by_phone_number(from_number)

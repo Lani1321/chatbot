@@ -6,7 +6,4 @@ Rails.application.routes.draw do
       post 'send_sms'
     end
   end
-
-  resource :users
-
 end
