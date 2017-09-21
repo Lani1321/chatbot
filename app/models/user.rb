@@ -11,6 +11,12 @@ class User < ApplicationRecord
     event :select_language_person_two do 
       transition :selecting_language => :messaging_friend
     end
+    event :change_language do
+      transition :messaging_friend => :changed_language
+    end
+    event :set_new_language do
+      transition :changed_language => :messaging_friend
+    end
   end
 
 end

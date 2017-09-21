@@ -14,11 +14,18 @@ class Messenger
       elsif user.state == "selecting_language"
         set_language(message_body, from_number)
   
-      elsif user.state == "person_two_select_language"
+      elsif user.state == "changed_language"
+        update_language(user, from_number, message_body)
       
       # User state is messaging_friend
       else
-        chat_bot(message_body, from_number)
+        
+        # Only change language if state is messaging_friend
+        if message_body =~ /[Cc]hatbot -h/
+          change_language(user, from_number)
+        else
+          chat_bot(message_body, from_number)
+        end
       end
     
     # If user doesn't exist
@@ -61,11 +68,17 @@ class Messenger
 
       # We don't want user inputting a phone number when they are person two
       if user.phone_number && user.friend_phone_number
-        send_sms(from_number, "You set your language to #{message_body}.  You can start messaging now!")
-        user.update(language: message_body)
-        user.select_language_person_two
+        if user.state == "changed_language"
+          send_sms(from_number, "You now set your language to #{message_body}.  You can start messaging now!")
+          user.update(language: message_body)
+          user.set_new_language
+        else
+          send_sms(from_number, "You set your language to #{message_body}.  If you ever want to change your language, just text 'Chatbot -h'.  You can start messaging now!")
+          user.update(language: message_body)
+          user.select_language_person_two
+        end
       else 
-        send_sms(from_number, "You set your language to #{message_body}.  Please, enter the phone number you would like to message.")
+        send_sms(from_number, "You set your language to #{message_body}.  If you ever want to change your language, just text 'Chatbot -h'.  Please, enter the phone number you would like to message.")
         user.update(language: message_body)
         user.select_language
       end
@@ -103,6 +116,15 @@ class Messenger
       :phone_number => from_number
       )
     send_sms(from_number, "Welcome to Chatbot!!  I'm fluent in just about any language.  Please select a language you would like to text in." )
+  end
+
+  def self.change_language(user, from_number)
+    user.change_language
+    send_sms(from_number, "What would you like to change your language to?")
+  end
+
+  def self.update_language(user, from_number, message_body)
+    set_language(message_body, from_number)
   end
 
   def self.send_sms(recipient_phone_number, message)
