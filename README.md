@@ -9,7 +9,6 @@ Simply set your language and the telephone number you wish to message by followi
 ![Alt Text](https://i.imgur.com/g2FE2vI.gif)
 
 Below are a list of future features:
-- Change your language preference
 - Change the telephone number you'd like to message
 - Messaging international telephone numbers
 - Messaging multiple telephone numbers
