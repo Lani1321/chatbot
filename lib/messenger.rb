@@ -69,7 +69,7 @@ class Messenger
       # We don't want user inputting a phone number when they are person two
       if user.phone_number && user.friend_phone_number
         
-        # Change language
+        # Change language if language is already set
         if user.state == "changed_language"
           send_sms(from_number, "You now set your language to #{message_body}.  You can start messaging now!")
           user.update(language: message_body)
